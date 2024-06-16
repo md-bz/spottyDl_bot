@@ -72,15 +72,17 @@ async function handleTrack(ctx, link) {
 
 async function handleAlbum(ctx, link) {
     const album = await spottydl.getAlbum(link);
+    const albumLength = album.tracks.length;
 
-    for (let i = 0; i < album.tracks.length; i++) {
+    for (let i = 0; i < albumLength; i++) {
         const albumTrack = album.tracks[i];
         const cache = await getMusicCache(albumTrack.title, album.artist);
         if (cache) {
             await ctx.replyWithAudio(cache.fileId);
-            await ctx.reply(`${i + 1} of ${playlist.trackCount} is done.`);
+            await ctx.reply(`${i + 1} of ${albumLength} is done.`);
             continue;
         }
+
         const track = {
             title: albumTrack.title,
             artist: album.artist,
