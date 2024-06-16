@@ -94,7 +94,7 @@ async function handleAlbum(ctx, link) {
         };
 
         await sendAndCacheTrack(ctx, track);
-        await ctx.reply(`${i + 1} of ${playlist.trackCount} is done.`);
+        await ctx.reply(`${i + 1} of ${albumLength} is done.`);
     }
 }
 
