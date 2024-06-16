@@ -115,7 +115,7 @@ async function handlePlaylist(ctx, link) {
 }
 
 bot.on("message", async (ctx) => {
-    const link = ctx.text;
+    let link = ctx.text;
     if (link.startsWith("open") || link.startsWith("play"))
         link = "https://" + link;
 
