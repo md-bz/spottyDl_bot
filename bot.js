@@ -1,10 +1,10 @@
 const dotenv = require("dotenv").config();
-const { Telegraf, Input, Telegram } = require("telegraf");
+const { Telegraf } = require("telegraf");
 const { parse } = require("spotify-uri");
-const spottydl = require("spottydl");
-const fs = require("fs/promises");
+
 const { default: mongoose } = require("mongoose");
-const { createMusicCache, getMusicCache } = require("./musicCacheController");
+const musicHandler = require("./utils/musicHandler");
+
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 const db = mongoose.connect(process.env.DB_LOCAL).then(() => {
@@ -37,83 +37,6 @@ bot.telegram.setMyDescription("A simple bot to get Songs from spotify link");
 
 bot.botInfo = "A simple bot to get Songs from spotify link";
 
-async function sendAndCacheTrack(ctx, track) {
-    let file = await spottydl.downloadTrack(track);
-    file = file[0];
-
-    if (file.status !== "Success") {
-        // #TODO: retry or do sth else
-        return ctx.reply(`Failed downloading ${track.title}`);
-    }
-    const channelMessage = await ctx.telegram.sendAudio(
-        process.env.BACKUP_CHANNEL,
-        Input.fromLocalFile(file.filename)
-    );
-
-    const fileId = channelMessage.audio.file_id;
-
-    await ctx.replyWithAudio(fileId);
-
-    await createMusicCache(track.title, track.artist, fileId);
-
-    await fs.rm(file.filename);
-}
-
-async function handleTrack(ctx, link) {
-    const track = await spottydl.getTrack(link);
-
-    const cache = await getMusicCache(track.title, track.artist);
-    if (cache) {
-        return await ctx.replyWithAudio(cache.fileId);
-    }
-
-    await sendAndCacheTrack(ctx, track);
-}
-
-async function handleAlbum(ctx, link) {
-    const album = await spottydl.getAlbum(link);
-    const albumLength = album.tracks.length;
-
-    for (let i = 0; i < albumLength; i++) {
-        const albumTrack = album.tracks[i];
-        const cache = await getMusicCache(albumTrack.title, album.artist);
-        if (cache) {
-            await ctx.replyWithAudio(cache.fileId);
-            await ctx.reply(`${i + 1} of ${albumLength} is done.`);
-            continue;
-        }
-
-        const track = {
-            title: albumTrack.title,
-            artist: album.artist,
-            year: album.year,
-            album: album.name,
-            id: albumTrack.id,
-            albumCoverURL: album.albumCoverURL,
-            trackNumber: albumTrack.trackNumber,
-        };
-
-        await sendAndCacheTrack(ctx, track);
-        await ctx.reply(`${i + 1} of ${albumLength} is done.`);
-    }
-}
-
-async function handlePlaylist(ctx, link) {
-    const playlist = await spottydl.getPlaylist(link);
-    for (let i = 0; i < playlist.tracks.length; i++) {
-        const track = playlist.tracks[i];
-
-        const cache = await getMusicCache(track.title, track.artist);
-        if (cache) {
-            await ctx.replyWithAudio(cache.fileId);
-            await ctx.reply(`${i + 1} of ${playlist.trackCount} is done.`);
-            continue;
-        }
-        await sendAndCacheTrack(ctx, track);
-        await ctx.reply(`${i + 1} of ${playlist.trackCount} is done.`);
-    }
-}
-
 bot.on("message", async (ctx) => {
     let link = ctx.text;
     if (link.startsWith("open") || link.startsWith("play"))
@@ -130,11 +53,11 @@ bot.on("message", async (ctx) => {
     ctx.reply("Please be patient...");
 
     if (parsed.type === "track") {
-        handleTrack(ctx, link);
+        musicHandler.handleTrack(parsed.id, ctx);
     } else if (parsed.type === "album") {
-        handleAlbum(ctx, link);
+        musicHandler.handleAlbum(parsed.id, ctx);
     } else {
-        handlePlaylist(ctx, link);
+        musicHandler.handlePlaylist(parsed.id, ctx);
     }
 });
 
