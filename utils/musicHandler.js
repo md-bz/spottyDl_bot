@@ -62,7 +62,6 @@ async function handleTrackAndCaching(track, ctx) {
     track.artist = track.artists.map((artist) => artist.name).join(", ");
 
     const cache = await getMusicCache(track.name, track.artist);
-    console.log(cache);
 
     if (cache) {
         return await ctx.replyWithAudio(cache.fileId);
@@ -81,8 +80,6 @@ async function handleTrackAndCaching(track, ctx) {
     const fileId = channelMessage.audio.file_id;
 
     await ctx.replyWithAudio(fileId);
-
-    console.log(track.title, track.artist);
 
     await createMusicCache(track.name, track.artist, fileId);
 

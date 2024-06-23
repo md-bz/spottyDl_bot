@@ -26,8 +26,6 @@ async function getAlbumGenre(searchQuery) {
         throw new Error("No deezer album found!");
     }
 
-    console.log(albums[0]);
-
     const genre = await getGenre(albums[0].genre_id);
 
     return genre.name;
