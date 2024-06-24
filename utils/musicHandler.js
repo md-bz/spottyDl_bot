@@ -118,13 +118,14 @@ async function handlePlaylist(playlistId, ctx) {
         for (let i = 0; i < items.length; i++) {
             const track = items[i].track;
             await handleTrackAndCaching(track, ctx);
+            ctx.reply(`${i + 1} out of ${items.length} is done.`);
         }
     } catch (error) {
         await handleError(error, ctx);
     }
 }
 
-async function handleAlbum(spotifyId) {
+async function handleAlbum(spotifyId, ctx) {
     try {
         const album = await spotify.getAlbum(spotifyId);
         const artist = album.artists.map((artist) => artist.name).join(", ");
@@ -182,6 +183,8 @@ async function handleAlbum(spotifyId) {
             await createMusicCache(title, artist, fileId);
 
             await fs.rm(filename);
+
+            ctx.reply(`${i + 1} out of ${items.length} is done.`);
         }
     } catch (error) {
         await handleError(error, ctx);

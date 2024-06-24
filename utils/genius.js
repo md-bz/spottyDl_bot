@@ -1,5 +1,5 @@
 const Genius = require("genius-lyrics");
-const Client = new Genius.Client(process.env.GENIUS_TOkEN);
+const Client = new Genius.Client(process.env.GENIUS_TOKEN);
 
 async function getGenius(searchQuery) {
     try {
