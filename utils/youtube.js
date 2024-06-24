@@ -30,12 +30,7 @@ async function findAndDownload(
             .save(filename)
             .on("error", async (err) => {
                 // await fs.unlink(filename);
-                reject(
-                    null
-                    // new Error(
-                    //     `Failed to download and convert track: ${err.message}`
-                    // )
-                );
+                reject(err);
             })
             .on("end", function () {
                 resolve(filename);

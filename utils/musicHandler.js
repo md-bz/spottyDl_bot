@@ -155,8 +155,10 @@ async function handleAlbum(spotifyId, ctx) {
 
             const searchQuery = `${title} - ${artist}`;
 
-            const filename = await findAndDownload(searchQuery);
-            if (filename === null) {
+            try {
+                // done so the rest of the album is downloaded
+                const filename = await findAndDownload(searchQuery);
+            } catch (error) {
                 await ctx.reply(`Failed downloading ${title}`);
                 continue;
             }
