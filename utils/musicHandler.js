@@ -118,7 +118,7 @@ async function handlePlaylist(playlistId, ctx) {
         for (let i = 0; i < items.length; i++) {
             const track = items[i].track;
             await handleTrackAndCaching(track, ctx);
-            ctx.reply(`${i + 1} out of ${items.length} is done.`);
+            await ctx.reply(`${i + 1} out of ${items.length} is done.`);
         }
     } catch (error) {
         await handleError(error, ctx);
@@ -134,8 +134,10 @@ async function handleAlbum(spotifyId, ctx) {
         let albumCover = await fetch(album.images[0].url);
         const coverBuffer = await albumCover.arrayBuffer();
 
-        for (let i = 0; i < album.tracks.items.length; i++) {
-            const track = album.tracks.items[i];
+        const items = album.tracks.items;
+
+        for (let i = 0; i < items.length; i++) {
+            const track = items[i];
 
             const artist = track.artists
                 .map((artist) => artist.name)
@@ -145,7 +147,8 @@ async function handleAlbum(spotifyId, ctx) {
             const cache = await getMusicCache(title, artist);
 
             if (cache) {
-                return await ctx.replyWithAudio(cache.fileId);
+                await ctx.replyWithAudio(cache.fileId);
+                continue;
             }
 
             const searchQuery = `${title} - ${artist}`;
@@ -184,7 +187,7 @@ async function handleAlbum(spotifyId, ctx) {
 
             await fs.rm(filename);
 
-            ctx.reply(`${i + 1} out of ${items.length} is done.`);
+            await ctx.reply(`${i + 1} out of ${items.length} is done.`);
         }
     } catch (error) {
         await handleError(error, ctx);
