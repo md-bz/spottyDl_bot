@@ -29,11 +29,12 @@ async function findAndDownload(
             .format(extension === "mp3" ? "mp3" : "adts")
             .save(filename)
             .on("error", async (err) => {
-                await fs.unlink(filename);
+                // await fs.unlink(filename);
                 reject(
-                    new Error(
-                        `Failed to download and convert track: ${err.message}`
-                    )
+                    null
+                    // new Error(
+                    //     `Failed to download and convert track: ${err.message}`
+                    // )
                 );
             })
             .on("end", function () {

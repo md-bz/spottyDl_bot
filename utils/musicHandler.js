@@ -70,7 +70,7 @@ async function handleTrackAndCaching(track, ctx) {
 
     if (file.status === "Failed") {
         // #TODO: retry or do sth else
-        return ctx.reply(`Failed downloading ${track.title}`);
+        return ctx.reply(`Failed downloading ${track.name}`);
     }
     const channelMessage = await ctx.telegram.sendAudio(
         process.env.BACKUP_CHANNEL,
@@ -148,12 +148,19 @@ async function handleAlbum(spotifyId, ctx) {
 
             if (cache) {
                 await ctx.replyWithAudio(cache.fileId);
+                await ctx.reply(`${i + 1} out of ${items.length} is done.`);
+
                 continue;
             }
 
             const searchQuery = `${title} - ${artist}`;
 
             const filename = await findAndDownload(searchQuery);
+            if (filename === null) {
+                await ctx.reply(`Failed downloading ${title}`);
+                continue;
+            }
+
             const geniusInfo = await getGenius(searchQuery);
 
             const tags = {

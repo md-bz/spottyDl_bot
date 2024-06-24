@@ -16,7 +16,7 @@ async function getGenius(searchQuery) {
             lyrics,
         };
     } catch (error) {
-        console.error(error);
+        // console.error("");
         return {
             track: {},
             lyrics: "",
