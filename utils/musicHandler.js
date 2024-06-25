@@ -157,7 +157,7 @@ async function handleAlbum(spotifyId, ctx) {
 
             let filename;
             try {
-                // done so the rest of the album is downloaded
+                // local try catch so the rest of the album is downloaded
                 filename = await findAndDownload(searchQuery);
             } catch (error) {
                 await ctx.reply(`Failed downloading ${title}`);
