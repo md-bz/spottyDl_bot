@@ -58,6 +58,19 @@ class Spotify {
         await this.callEndpoint("albums", albumIds.join(","));
     getPlaylist = async (playlistId) =>
         await this.callEndpoint("playlists", playlistId);
+
+    search = async (searchQuery, type = "track") => {
+        await this.getToken();
+        let response = await fetch(
+            `https://api.spotify.com/v1/search?q=${searchQuery}&type=${type}`,
+            {
+                method: "GET",
+                headers: { Authorization: "Bearer " + this.token },
+            }
+        );
+
+        return await response.json();
+    };
 }
 
 module.exports = Spotify;

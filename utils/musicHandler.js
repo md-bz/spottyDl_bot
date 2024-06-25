@@ -204,6 +204,28 @@ async function handleAlbum(spotifyId, ctx) {
     }
 }
 
+async function getTopSongs() {
+    try {
+        const playlist = await spotify.getPlaylist("37i9dQZEVXbMDoHDwVN2tF");
+        console.log("playlist is ");
+        console.log(playlist);
+
+        return playlist.tracks.items;
+    } catch (error) {
+        throw error;
+    }
+}
+async function search(searchQuery) {
+    try {
+        const results = await spotify.search(searchQuery);
+        console.log("result is ");
+        console.log(results);
+        return results.tracks.items;
+    } catch (error) {
+        throw error;
+    }
+}
+
 // handleTrack("5XeFes4btLpXzIVDNQP22m"); //wrong id for testing
 // handleTrack("5XeFesFbtLpXzIVDNQP22n");
 //
@@ -213,4 +235,11 @@ async function handleAlbum(spotifyId, ctx) {
 // handlePlaylist("37i9dQZF1DWX4UlFW6EJP5"); // wrong id
 // handlePlaylist("37i9dQZF1DWX4UlFW6EJPs");
 
-module.exports = { handleTrack, handlePlaylist, handleAlbum, dl };
+module.exports = {
+    handleTrack,
+    handlePlaylist,
+    handleAlbum,
+    search,
+    dl,
+    getTopSongs,
+};
