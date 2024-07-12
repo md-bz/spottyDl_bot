@@ -1,5 +1,5 @@
 const fs = require("fs/promises");
-// const dotenv = require("dotenv").config();
+const dotenv = require("dotenv").config();
 const NodeID3 = require("node-id3");
 const { Input } = require("telegraf");
 
@@ -147,13 +147,13 @@ async function handleMusicByCtx(ctx) {
 
     if (parsed.platform === "spotify") {
         if (parsed.type === "track") {
-            return musicHandler.handleTrack(parsed.id, ctx);
+            return handleTrack(parsed.id, ctx);
         }
         if (parsed.type === "album") {
-            return musicHandler.handleAlbum(parsed.id, ctx);
+            return handleAlbum(parsed.id, ctx);
         }
         if (parsed.type === "playlist") {
-            return musicHandler.handlePlaylist(parsed.id, ctx);
+            return handlePlaylist(parsed.id, ctx);
         }
     }
 
