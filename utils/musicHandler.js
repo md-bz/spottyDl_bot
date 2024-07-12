@@ -11,8 +11,13 @@ const {
     createMusicCache,
     getMusicCache,
 } = require("../db/musicCacheController");
+const parse = require("./parser");
 
 const spotify = new Spotify(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
+
+async function getArtistName(artists) {
+    return artists.map((artist) => artist.name).join(", ");
+}
 
 async function dl(track) {
     try {
@@ -125,6 +130,69 @@ async function handlePlaylist(playlistId, ctx) {
     }
 }
 
+async function handleMusicByCtx(ctx) {
+    let parsed;
+
+    try {
+        parsed = await parse(ctx.text);
+    } catch (error) {
+        console.log(error);
+
+        return ctx.reply("Please provide a valid link.");
+    }
+
+    ctx.reply("Please be patient...");
+
+    console.log(parsed);
+
+    if (parsed.platform === "spotify") {
+        if (parsed.type === "track") {
+            return musicHandler.handleTrack(parsed.id, ctx);
+        }
+        if (parsed.type === "album") {
+            return musicHandler.handleAlbum(parsed.id, ctx);
+        }
+        if (parsed.type === "playlist") {
+            return musicHandler.handlePlaylist(parsed.id, ctx);
+        }
+    }
+
+    if (parsed.platform === "deezer") {
+        // currently extremely inefficient
+        let res = await fetch(
+            `https://api.deezer.com/${parsed.type}/${parsed.id}`
+        );
+
+        res = await res.json();
+        console.log(res);
+
+        const artist = getArtistName(res.contributors);
+
+        let searchResult = await spotify.search(
+            `${res.title} - ${artist}`,
+            parsed.type
+        );
+
+        if (parsed.type === "track") {
+            return handleTrack(searchResult.tracks.items[0].id, ctx);
+        }
+
+        if (parsed.type === "album") {
+            console.log("items:");
+
+            console.log(searchResult.albums.items);
+
+            return handleAlbum(searchResult.albums.items[0].id, ctx);
+        }
+        if (parsed.type === "playlist") {
+            // #TODO : deezer playlist
+            return await ctx.reply(
+                "Deezer playlists are not currently supported"
+            );
+        }
+    }
+}
+
 async function handleAlbum(spotifyId, ctx) {
     try {
         const album = await spotify.getAlbum(spotifyId);
@@ -218,8 +286,7 @@ async function getTopSongs() {
 async function search(searchQuery) {
     try {
         const results = await spotify.search(searchQuery);
-        console.log("result is ");
-        console.log(results);
+        const list = results.tracks.items.map((track) => track.name);
         return results.tracks.items;
     } catch (error) {
         throw error;
@@ -242,4 +309,5 @@ module.exports = {
     search,
     dl,
     getTopSongs,
+    handleMusicByCtx,
 };
