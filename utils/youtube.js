@@ -1,9 +1,9 @@
 const YTMusic = require("ytmusic-api");
-const ytdl = require("ytdl-core");
+const ytdl = require("@distube/ytdl-core");
 const fs = require("fs/promises");
 const Ffmpeg = require("fluent-ffmpeg");
 
-const yt = new YTMusic.default();
+const yt = new YTMusic();
 
 async function findAndDownload(
     searchQuery,
@@ -37,5 +37,6 @@ async function findAndDownload(
             });
     });
 }
+findAndDownload("monster - eminem");
 
 module.exports = findAndDownload;
