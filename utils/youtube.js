@@ -3,7 +3,7 @@ const ytdl = require("@distube/ytdl-core");
 const fs = require("fs/promises");
 const Ffmpeg = require("fluent-ffmpeg");
 
-const yt = new YTMusic();
+const yt = new YTMusic.default();
 
 async function findAndDownload(
     searchQuery,
@@ -12,6 +12,8 @@ async function findAndDownload(
     bitrate = 192
 ) {
     await yt.initialize();
+    const agent = ytdl.createProxyAgent({ uri: "http://localhost:8086" });
+
     const tracks = await yt.searchSongs(searchQuery);
 
     if (!tracks || tracks.length === 0) {
@@ -23,6 +25,7 @@ async function findAndDownload(
             ytdl(tracks[0].videoId, {
                 quality: "highestaudio",
                 filter: "audioonly",
+                agent,
             })
         )
             .audioBitrate(bitrate)
