@@ -1,9 +1,10 @@
 const YTMusic = require("ytmusic-api");
-const ytdl = require("ytdl-core");
+const ytdl = require("@distube/ytdl-core");
 const fs = require("fs/promises");
 const Ffmpeg = require("fluent-ffmpeg");
+const { cookies } = require("../env.cookies");
 
-const yt = new YTMusic.default();
+const yt = new YTMusic();
 
 async function findAndDownload(
     searchQuery,
@@ -12,6 +13,8 @@ async function findAndDownload(
     bitrate = 192
 ) {
     await yt.initialize();
+    const agent = ytdl.createAgent(cookies);
+
     const tracks = await yt.searchSongs(searchQuery);
 
     if (!tracks || tracks.length === 0) {
@@ -21,6 +24,7 @@ async function findAndDownload(
     return await new Promise((resolve, reject) => {
         Ffmpeg(
             ytdl(tracks[0].videoId, {
+                agent,
                 quality: "highestaudio",
                 filter: "audioonly",
             })
