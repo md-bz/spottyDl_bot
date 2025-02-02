@@ -4,7 +4,13 @@ async function parse(link) {
             const res = await fetch(link);
             link = res.url;
         }
-
+        if (link.startsWith("spotify:")) {
+            return {
+                platform: "spotify",
+                type: link.split(":")[1],
+                id: link.split(":")[2],
+            };
+        }
         const url = new URL(link.startsWith("http") ? link : "https://" + link);
 
         let platform = null;
