@@ -29,7 +29,6 @@ class Spotify {
         } catch (error) {
             console.error(error);
         }
-        // if (response.tr)
         this.token = response.access_token;
         this.expireAt = Date.now() + 1 * 60 * 60 * 1000 - 5 * 1000; // 1 hour from now minus 5 seconds
     }

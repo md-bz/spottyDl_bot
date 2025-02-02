@@ -136,14 +136,14 @@ async function handleMusicByCtx(ctx) {
     try {
         parsed = await parse(ctx.text);
     } catch (error) {
-        console.log(error);
+        console.error(error);
 
         return ctx.reply("Please provide a valid link.");
     }
 
     ctx.reply("Please be patient...");
 
-    console.log(parsed);
+    console.error(parsed);
 
     if (parsed.platform === "spotify") {
         if (parsed.type === "track") {
@@ -164,7 +164,7 @@ async function handleMusicByCtx(ctx) {
         );
 
         res = await res.json();
-        console.log(res);
+        console.error(res);
 
         const artist = getArtistName(res.contributors);
 
@@ -178,9 +178,9 @@ async function handleMusicByCtx(ctx) {
         }
 
         if (parsed.type === "album") {
-            console.log("items:");
+            console.error("items:");
 
-            console.log(searchResult.albums.items);
+            console.error(searchResult.albums.items);
 
             return handleAlbum(searchResult.albums.items[0].id, ctx);
         }
@@ -275,8 +275,8 @@ async function handleAlbum(spotifyId, ctx) {
 async function getTopSongs() {
     try {
         const playlist = await spotify.getPlaylist("37i9dQZEVXbMDoHDwVN2tF");
-        console.log("playlist is ");
-        console.log(playlist);
+        console.error("playlist is ");
+        console.error(playlist);
 
         return playlist.tracks.items;
     } catch (error) {
@@ -292,16 +292,6 @@ async function search(searchQuery) {
         throw error;
     }
 }
-
-// handleTrack("5XeFes4btLpXzIVDNQP22m"); //wrong id for testing
-// handleTrack("5XeFesFbtLpXzIVDNQP22n");
-//
-// downloadTrack("https://open.spotify.com/track/0USEeJtdeeJaQ8EIeBB4cz");
-// downloadAlbum("1QIlhnFX2vOua9eLXNiUOg?");
-// downloadPlaylist("3LkDP3FKsIGbQ8hN44OY45");
-// handlePlaylist("37i9dQZF1DWX4UlFW6EJP5"); // wrong id
-// handlePlaylist("37i9dQZF1DWX4UlFW6EJPs");
-
 module.exports = {
     handleTrack,
     handlePlaylist,

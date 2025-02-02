@@ -33,7 +33,6 @@ async function findAndDownload(
             .format(extension === "mp3" ? "mp3" : "adts")
             .save(filename)
             .on("error", async (err) => {
-                // await fs.unlink(filename);
                 reject(err);
             })
             .on("end", function () {
